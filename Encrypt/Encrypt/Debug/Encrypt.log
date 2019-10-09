@@ -1,0 +1,18 @@
+﻿  Source.cpp
+c:\users\user\desktop\encrypt\encrypt\source.cpp(62): warning C4018: '<': signed/unsigned 不相符
+c:\users\user\desktop\encrypt\encrypt\source.cpp(84): warning C4018: '<': signed/unsigned 不相符
+c:\users\user\desktop\encrypt\encrypt\source.cpp(100): warning C4018: '<': signed/unsigned 不相符
+c:\users\user\desktop\encrypt\encrypt\source.cpp(113): warning C4018: '<': signed/unsigned 不相符
+c:\users\user\desktop\encrypt\encrypt\source.cpp(127): warning C4244: '+=': 將 'double' 轉換為 'int'，由於類型不同，可能導致資料遺失
+c:\users\user\desktop\encrypt\encrypt\source.cpp(142): warning C4018: '<': signed/unsigned 不相符
+c:\users\user\desktop\encrypt\encrypt\source.cpp(158): warning C4018: '<': signed/unsigned 不相符
+c:\users\user\desktop\encrypt\encrypt\source.cpp(169): warning C4018: '<': signed/unsigned 不相符
+c:\users\user\desktop\encrypt\encrypt\source.cpp(186): warning C4018: '<': signed/unsigned 不相符
+c:\users\user\desktop\encrypt\encrypt\source.cpp(202): warning C4018: '<': signed/unsigned 不相符
+c:\users\user\desktop\encrypt\encrypt\source.cpp(217): warning C4018: '<': signed/unsigned 不相符
+c:\users\user\desktop\encrypt\encrypt\source.cpp(220): warning C4018: '<': signed/unsigned 不相符
+c:\users\user\desktop\encrypt\encrypt\source.cpp(234): warning C4018: '<': signed/unsigned 不相符
+c:\users\user\desktop\encrypt\encrypt\source.cpp(267): warning C4018: '<': signed/unsigned 不相符
+c:\users\user\desktop\encrypt\encrypt\source.cpp(274): warning C4018: '<': signed/unsigned 不相符
+c:\users\user\desktop\encrypt\encrypt\source.cpp(347): warning C4018: '<': signed/unsigned 不相符
+  Encrypt.vcxproj -> C:\Users\user\Desktop\Encrypt\Debug\Encrypt.exe
