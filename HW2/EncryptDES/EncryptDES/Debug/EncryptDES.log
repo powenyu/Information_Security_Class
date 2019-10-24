@@ -1,3 +1,7 @@
 ﻿  Source.cpp
-c:\users\user\desktop\information_security_class\hw2\encryptdes\encryptdes\source.cpp(79): warning C4018: '<': signed/unsigned 不相符
+c:\users\user\desktop\information_security_class\hw2\encryptdes\encryptdes\source.cpp(221): warning C4018: '<': signed/unsigned 不相符
+c:\users\user\desktop\information_security_class\hw2\encryptdes\encryptdes\source.cpp(241): warning C4018: '<': signed/unsigned 不相符
+c:\users\user\desktop\information_security_class\hw2\encryptdes\encryptdes\source.cpp(274): warning C4018: '<': signed/unsigned 不相符
+c:\users\user\desktop\information_security_class\hw2\encryptdes\encryptdes\source.cpp(276): warning C4244: '+=': 將 'double' 轉換為 'int'，由於類型不同，可能導致資料遺失
+c:\users\user\desktop\information_security_class\hw2\encryptdes\encryptdes\source.cpp(370): warning C4244: '+=': 將 'double' 轉換為 'int'，由於類型不同，可能導致資料遺失
   EncryptDES.vcxproj -> C:\Users\user\Desktop\Information_Security_Class\HW2\EncryptDES\Debug\EncryptDES.exe

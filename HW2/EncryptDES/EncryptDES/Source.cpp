@@ -61,37 +61,125 @@ vector<int> S8 = { 13,2,8,4,6,15,11,1,10,9,3,14,5,0,12,7,
 				   1,15,13,8,10,3,7,4,12,5,6,11,0,14,9,2,
 				   7,11,4,1,9,12,14,2,0,6,10,13,15,3,5,8,
 				   2,1,14,7,4,10,8,13,15,12,9,0,3,5,6,11,};
+vector<int> CP1 = {
+	57,49,41,33,25,17,9,
+	1,58,50,42,34,26,18,
+	10,2,59,51,43,35,27,
+	19,11,3,60,52,44,36,
+	63,55,47,39,31,23,15,
+	7,62,54,46,38,30,22,
+	14,6,61,53,45,37,29,
+	21,13,5,28,20,12,4,
+};
+vector<int> CP2 = {
+	14,17,11,24,1,5,
+	3,28,15,6,21,10,
+	23,19,12,4,26,8,
+	16,7,27,20,13,2,
+	41,52,31,37,47,55,
+	30,40,51,45,33,48,
+	44,49,39,56,34,53,
+	46,42,50,36,29,32,
+};
+vector<int> P = {
+	16,7,20,21,29,12,28,17,
+	1,15,23,26,5,18,31,10,
+	2,8,24,14,32,27,3,9,
+	19,13,30,6,22,11,4,25,
+};
 
 
 
 //function 宣告
 string rePosition(string text,vector<int> &a);
-string iniPlaintext(string text);
+string iniPlaintext(string text,int length);
 string hecTobin(string hex);
 string PartofString(string text, int first, int end);
 string xorVec(string S1, string S2);
+string rotateShift(string key, int time);
+string Sbox(string textR);
+string SSbox(string textR,int first, int end , vector<int> &S);
+string binToHec(string text);
+int bintoDec(string num);
 
 int main()
 {
+	int shiftTime;
 	string ini;
-	iniPlaintext(ini);
+	iniPlaintext(ini,64);
 	ini = hecTobin("0xabcdef0123456789");
-	cout << ini << endl;
 	ini = rePosition(ini, Ip);
-	cout << ini <<endl;
-	string R;
-	string L;
-	L = PartofString(ini, 0, 32);
-	R = PartofString(ini, 32, 64);
+	string key; //第一次輸入的64bits key
+	iniPlaintext(key, 64);
+	key = hecTobin("0xafafafafafafafaf");
+	key = rePosition(key, CP1); //第一次換位
+
+	for (int i = 0; i < 16; i++)
+	{
+		if (i == 0 || i == 1 || i == 8 || i == 15)
+		{
+			shiftTime = 2;
+		}
+		else
+		{
+			shiftTime = 1;
+		}
+
+		string R;
+		string L;
+		string RE; //右邊展開過的
+		//明文分左右
+		L = PartofString(ini, 0, 32);
+		R = PartofString(ini, 32, 64);
+		//右邊加長
+		RE = rePosition(R, E);
+		//key schedule
+		string keyL;
+		string keyR;
+		string Roundkey;
+		//key分左右
+		keyL = PartofString(key, 0, 28);
+		keyR = PartofString(key, 28, 56);
+		//依次數shift
+		keyL = rotateShift(keyL, shiftTime);
+		keyR = rotateShift(keyR, shiftTime);
+		//獲得新keybase
+		key.clear();
+		key += keyL;
+		key += keyR;
+		//這輪的子key
+		Roundkey = rePosition(key, CP2);//第二次換位
+
+		//明文右半跟子key XOR
+		RE = xorVec(RE, Roundkey);
+		//SBOX
+		RE = Sbox(RE);
+		//跟P做轉換
+		RE = rePosition(RE, P);
+		//跟左半XOR
+		RE = xorVec(RE, L);
+		//新的明文 要左右相反
+		ini.clear();
+		ini += RE;
+		ini += L;
+	}
+
+
+	ini = rePosition(ini, Fp); //最後轉換
+
+	ini = binToHec(ini);
+	cout << ini << endl;
 	system("pause");
+
+
 }
 
 
 //初始化陣列
-string iniPlaintext(string text) 
+string iniPlaintext(string text, int length)
 {
 	text.clear();
-	for (int i = 0; i < 64; i++)
+	for (int i = 0; i < length; i++)
 	{
 		 text += '2'; //只會有1 跟 0 所以跑出2代表有誤
 	}
@@ -149,15 +237,148 @@ string PartofString(string text, int first, int end)
 //Xor實作
 string xorVec(string S1, string S2)
 {
-	int sum = 0;
+	string Xor;
 	for (int i = 0; i < S1.size(); i++)
 	{
 		if (S1[i] != S2[i])
 		{
-			sum += pow(2, 4 - i);
+			Xor += '1';
+		}
+		else
+		{
+			Xor += '0';
 		}
 	}
+	return Xor;
+}
+//key always 28 bits
+string rotateShift(string key, int time) 
+{
+	string temp;
+	string shiftKey;
+	for (int i = 0; i < time; i++)
+	{
+		temp += key[i];
+	}
+	for (int i = time; i < 28 ; i++)
+	{
+		shiftKey += key[i];
+	}
+	shiftKey += temp;
+	return shiftKey;
+}
+
+int bintoDec(string num)
+{
+	int sum = 0;
+	for (int i = 0; i < num.size(); i++)
+	{
+		sum += pow(2, (num.size() - i - 1))*(num[i] - '0');
+	}
+	return sum;
+}
+
+string Sbox(string textR)
+{
 	string result;
-	result = to_string(sum);
+	result += SSbox(textR, 0, 6, S1);
+	result += SSbox(textR, 6, 12, S2);
+	result += SSbox(textR, 12, 18, S3);
+	result += SSbox(textR, 18, 24, S4);
+	result += SSbox(textR, 24, 30, S5);
+	result += SSbox(textR, 30, 36, S6);
+	result += SSbox(textR, 36, 42, S7);
+	result += SSbox(textR, 42, 48, S8);
+	/*string Result;
+	string temp;
+	string rowTemp;
+	int Row;
+	int Col;
+	//S1
+	temp = PartofString(textR, 0, 6);
+	rowTemp += temp[0];
+	rowTemp += temp[5];
+	Row = bintoDec(rowTemp);
+	rowTemp.clear();
+	for (int i = 1; i < 5; i++)
+	{
+		rowTemp += temp[i];
+	}
+	Col = bintoDec(rowTemp);
+	//============================= 
+	temp.clear();
+	for (int time = 0; time < 4; time++)
+	{
+		temp += to_string(S1[Row * 16 + Col] & 1)[0];
+		S1[Row * 16 + Col] = S1[Row * 16 + Col] >> 1;
+	}
+
+	for (int i = 0; i < 2; i++)
+	{
+		char swap = temp[i];
+		temp[i] = temp[3 - i];
+		temp[3 - i] = swap;
+	}
+	//================================*/
 	return result;
+}
+
+string SSbox(string textR, int first, int end, vector<int> &S)
+{
+	string Result;
+	string temp;
+	string rowTemp;
+	int Row;
+	int Col;
+	//S1
+	temp = PartofString(textR, first, end);
+	rowTemp += temp[0];
+	rowTemp += temp[5];
+	Row = bintoDec(rowTemp);
+	rowTemp.clear();
+	for (int i = 1; i < 5; i++)
+	{
+		rowTemp += temp[i];
+	}
+	Col = bintoDec(rowTemp);
+	//============================= 
+	temp.clear();
+	for (int time = 0; time < 4; time++)
+	{
+		temp += to_string(S[Row * 16 + Col] & 1)[0];
+		S[Row * 16 + Col] = S[Row * 16 + Col] >> 1;
+	}
+
+	for (int i = 0; i < 2; i++)
+	{
+		char swap = temp[i];
+		temp[i] = temp[3 - i];
+		temp[3 - i] = swap;
+	}
+	//================================
+	return temp;
+}
+
+string binToHec(string text)
+{
+	string result = "0x";
+	for (int j = 0; j < 16; j++)
+	{
+		int sum = 0;
+		for (int i = 0; i < 4; i++)
+		{
+			sum += pow(2, 3 - i)*(text[j * 4 + i] - '0');
+		}
+		if (sum <= 9)
+		{
+			result += to_string(sum);
+		}
+		else
+		{
+			sum += ('A' - 10);
+			result += sum;
+		}
+	}
+	return result;
+
 }
