@@ -102,28 +102,37 @@ string SSbox(string textR,int first, int end , vector<int> &S);
 string binToHec(string text);
 int bintoDec(string num);
 
-int main()
+int main(int argc, char *argv[])
 {
+	string inputtext;
+	string inputkey;
+
+	inputkey = argv[1];
+	inputtext = argv[2];
+
 	int shiftTime;
 	string ini;
 	iniPlaintext(ini,64);
-	ini = hecTobin("0xabcdef0123456789");
+	ini = hecTobin(inputtext);
 	ini = rePosition(ini, Ip);
 	string key; //第一次輸入的64bits key
 	iniPlaintext(key, 64);
-	key = hecTobin("0xafafafafafafafaf");
+	key = hecTobin(inputkey);
 	key = rePosition(key, CP1); //第一次換位
-
 	for (int i = 0; i < 16; i++)
 	{
 		if (i == 0 || i == 1 || i == 8 || i == 15)
 		{
-			shiftTime = 2;
+			shiftTime = 1;
 		}
 		else
 		{
-			shiftTime = 1;
+			shiftTime = 2;
 		}
+		string keyL;
+		string keyR;
+		string Roundkey;
+
 
 		string R;
 		string L;
@@ -134,9 +143,7 @@ int main()
 		//右邊加長
 		RE = rePosition(R, E);
 		//key schedule
-		string keyL;
-		string keyR;
-		string Roundkey;
+		
 		//key分左右
 		keyL = PartofString(key, 0, 28);
 		keyR = PartofString(key, 28, 56);
@@ -152,23 +159,36 @@ int main()
 
 		//明文右半跟子key XOR
 		RE = xorVec(RE, Roundkey);
+
 		//SBOX
 		RE = Sbox(RE);
+
 		//跟P做轉換
 		RE = rePosition(RE, P);
+		
 		//跟左半XOR
 		RE = xorVec(RE, L);
+
 		//新的明文 要左右相反
 		ini.clear();
+		ini += R;
 		ini += RE;
-		ini += L;
+
 	}
 
-
+	string lastL;
+	string lastR;
+	lastL = PartofString(ini, 0, 32);
+	lastR = PartofString(ini, 32, 64);
+	ini.clear();
+	ini += lastR;
+	ini += lastL;
 	ini = rePosition(ini, Fp); //最後轉換
-
 	ini = binToHec(ini);
 	cout << ini << endl;
+
+
+	
 	system("pause");
 
 
@@ -289,37 +309,6 @@ string Sbox(string textR)
 	result += SSbox(textR, 30, 36, S6);
 	result += SSbox(textR, 36, 42, S7);
 	result += SSbox(textR, 42, 48, S8);
-	/*string Result;
-	string temp;
-	string rowTemp;
-	int Row;
-	int Col;
-	//S1
-	temp = PartofString(textR, 0, 6);
-	rowTemp += temp[0];
-	rowTemp += temp[5];
-	Row = bintoDec(rowTemp);
-	rowTemp.clear();
-	for (int i = 1; i < 5; i++)
-	{
-		rowTemp += temp[i];
-	}
-	Col = bintoDec(rowTemp);
-	//============================= 
-	temp.clear();
-	for (int time = 0; time < 4; time++)
-	{
-		temp += to_string(S1[Row * 16 + Col] & 1)[0];
-		S1[Row * 16 + Col] = S1[Row * 16 + Col] >> 1;
-	}
-
-	for (int i = 0; i < 2; i++)
-	{
-		char swap = temp[i];
-		temp[i] = temp[3 - i];
-		temp[3 - i] = swap;
-	}
-	//================================*/
 	return result;
 }
 
@@ -330,7 +319,6 @@ string SSbox(string textR, int first, int end, vector<int> &S)
 	string rowTemp;
 	int Row;
 	int Col;
-	//S1
 	temp = PartofString(textR, first, end);
 	rowTemp += temp[0];
 	rowTemp += temp[5];
@@ -343,10 +331,11 @@ string SSbox(string textR, int first, int end, vector<int> &S)
 	Col = bintoDec(rowTemp);
 	//============================= 
 	temp.clear();
+	int fuckNum = S[Row * 16 + Col];
 	for (int time = 0; time < 4; time++)
 	{
-		temp += to_string(S[Row * 16 + Col] & 1)[0];
-		S[Row * 16 + Col] = S[Row * 16 + Col] >> 1;
+		temp += to_string(fuckNum & 1)[0];
+		fuckNum = fuckNum >> 1;
 	}
 
 	for (int i = 0; i < 2; i++)
